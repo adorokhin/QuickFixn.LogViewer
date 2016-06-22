@@ -76,27 +76,27 @@ namespace QuickFixn.Converters
 
 	}
 
-	[Flags]
-	 public enum MessagingProperties
-	{
-		  None = 0x00,
-		  Durable = 0x01,
-		  Persistent = 0x02,
-		  Buffered = 0x04
-	}
+	//[Flags]
+	// public enum MessagingProperties
+	//{
+	//      None = 0x00,
+	//      Durable = 0x01,
+	//      Persistent = 0x02,
+	//      Buffered = 0x04
+	//}
 	
-	public class FIX2XMLConverter
+	public partial class FIXConverter
 	{
 		[ThreadStatic]
-		private static FIX2XMLConverter Instance = null;
+		private static FIXConverter Instance = null;
 
 		#region [Singleton]
-		private FIX2XMLConverter() { }
-		public static FIX2XMLConverter CreateInstance(string sFIXDictionary)
+		private FIXConverter() { }
+		public static FIXConverter CreateInstance(string sFIXDictionary)
 		{
 			if (Instance == null)
 			{
-				Instance = new FIX2XMLConverter();
+				Instance = new FIXConverter();
 
 				if(!string.IsNullOrEmpty(sFIXDictionary))
 				{
@@ -113,6 +113,7 @@ namespace QuickFixn.Converters
 
 		#region [Fields]
 		private static FIXDictionary.DataDictionary dataDictionary = null;
+		private static FIXDictionary.DataDictionary sessionDataDictionary = null;
 		private static IMessageFactory messageFactory = new DefaultMessageFactory();
 		private static FIXClassesInfo fixClasses = null;
 		#endregion
@@ -127,16 +128,33 @@ namespace QuickFixn.Converters
 		}
 		#endregion
 
-		public XElement BuildXMLFromString(string s)
+		public static void LoadDictionary(string sFIXDictionary)
+		{
+			if (!string.IsNullOrEmpty(sFIXDictionary))
+			{
+				dataDictionary = new FIXDictionary.DataDictionary();
+				dataDictionary.Load(sFIXDictionary);
+			}
+		}
+
+		public XElement BuildXMLFromString(string s, bool validateMsg = false, bool correctChks=true)
 		{
 			//"20150611-21:29:27.811 :"
 			//8=FIX
+
+			if (string.IsNullOrEmpty(s))
+				return null;
+
+			if (s != null)
+				s = s.Trim();
+
 
 			DateTime? logTimeStamp = null;
 			int fixStart = s.IndexOf("8=FIX");
 			if (fixStart > 0)
 			{
-				string dateString = s.Substring(0, fixStart-3);
+				string dateString = s.Substring(0, fixStart-1);
+				dateString = dateString.TrimEnd('\x01', ':', ' ');
 				string format = "yyyyMMdd-HH:mm:ss.fff";
 				DateTime dateTime;
 				if (DateTime.TryParseExact(dateString, format, CultureInfo.InvariantCulture,  DateTimeStyles.None, out dateTime))
@@ -146,20 +164,28 @@ namespace QuickFixn.Converters
 
 			
 			var msg = new QuickFix.Message();
-			msg.FromString(s, false, dataDictionary, dataDictionary, messageFactory);
+			s = s.Trim('\n');
+			s = s.Trim('\r');
+			//msg.FromString(s, false, dataDictionary, dataDictionary, messageFactory);
+			
+			var chksTuple = new Tuple<string, string>(string.Empty, string.Empty);
+			string sOrigChks = null;
+			if (correctChks)
+			{
+				if (!Utils.VerifyChecksum(ref s, out chksTuple, fixChecksum: true))
+					sOrigChks = chksTuple.Item1;
+			}
+
+			//---------------------------------------------------------------------------------------
+			msg.FromString(s, validateMsg, sessionDataDictionary, dataDictionary, messageFactory);
+			//---------------------------------------------------------------------------------------
+			
+
 			MsgType msgType = QuickFix.Message.IdentifyType(s);
-			return BuildXML(msg, msgType, logTimeStamp);
+			return BuildXML(msg, msgType, logTimeStamp, sOrigChks);
 		}
 
-		private string NormalizeFIXNameSpace(string s)
-		{
-			s = s.Replace(".", string.Empty);
-			if (s.StartsWith("FIXT"))
-				s = "FIX50";
-			return s;
-		}
-
-		public XElement BuildXML(QuickFix.Message msg,  MsgType msgType, DateTime? logTimeStamp = null)
+		public XElement BuildXML(QuickFix.Message msg,  MsgType msgType, DateTime? logTimeStamp = null, string origChkSum = null)
 		{
 			//Debug.WriteLine(" ~~~> " + msg.GetType().ToString());
 			SessionID sessionID = msg.GetSessionID(msg);
@@ -167,7 +193,7 @@ namespace QuickFixn.Converters
 			FIXClassInfo fixClass = null;
 			if (msg.GetType() == typeof(QuickFix.Message))
 			{
-				var classes = fixClasses[msgType.ToString(), NormalizeFIXNameSpace(sessionID.BeginString)];
+				var classes = fixClasses[msgType.ToString(), Utils.NormalizeFIXNameSpace(sessionID.BeginString)];
 				if(classes != null && classes.Count>0)
 					fixClass = classes[0];
 			}
@@ -188,13 +214,13 @@ namespace QuickFixn.Converters
 			root.Add(body);
 			
 			var trailer = new XElement(msg.Trailer.GetType().ToString());
-			ProcessFieldMapToXML(trailer, msg.Trailer);
+			ProcessFieldMapToXML(trailer, msg.Trailer, origChkSum);
 			root.Add(trailer);
 			
 			return root;
 		}
 
-		private void ProcessFieldMapToXML(XElement parent, FieldMap fieldMap)
+		private void ProcessFieldMapToXML(XElement parent, FieldMap fieldMap, string origChkSum=null)
 		{
 			Type fieldType;
 			XElement child = null;
@@ -214,6 +240,10 @@ namespace QuickFixn.Converters
 							child.Add(new XAttribute("EnumTranslation", enumTranslation));
 					}
 
+					if (field.Key == Tags.CheckSum && origChkSum != null)
+					{
+						child.Add(new XAttribute("OrigChks", origChkSum));
+					}
 
 					int groupCount = fieldMap.GroupCount(field.Key);
 

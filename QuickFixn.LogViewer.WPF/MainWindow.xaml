@@ -1,0 +1,83 @@
+﻿<Window x:Class="QuickFixn.LogViewer.WPF.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="FIX2XML"
+        Height="600"
+        Width="800"
+        WindowStartupLocation="CenterScreen"
+        Icon="LogViewer.ico">
+    <Grid Margin="0,0">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="1*" />
+            <RowDefinition Height="42" />
+            <RowDefinition Height="5*" />
+            <RowDefinition Height="45" />
+        </Grid.RowDefinitions>
+        <TextBox Grid.Row="0"
+                 x:Name="input"
+                 HorizontalAlignment="Stretch"
+                 Margin="5"
+                 VerticalAlignment="Stretch"
+                 BorderBrush="Black"
+                 BorderThickness="3"
+                 MinLines="1"
+                 AcceptsReturn="True" />
+        <Button Grid.Row="1" 
+                x:Name="btnConvert"
+                Content="Convert"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                Width="80"
+                IsDefault="True"
+                FontSize="16"
+                Click="btnConvert_Click">
+        </Button>
+        <StackPanel Grid.Row="1"
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Left"
+                    Margin="5"
+                    VerticalAlignment="Center"
+                    Width="250">
+            <Button x:Name="btnLoadDictionary"
+                    Content="Load Dictionary"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Width="120"
+                    Margin="10,0,0,0"
+                    FontSize="16"
+                    Click="btnLoadDictionary_Click">
+            </Button>
+        </StackPanel>
+        <Border Grid.Row="2"
+                BorderBrush="{DynamicResource {x:Static SystemColors.ActiveCaptionTextBrushKey}}"
+                BorderThickness="3"
+                CornerRadius="3"
+                Margin="5">
+            <WebBrowser x:Name="webBrowser"
+                        HorizontalAlignment="Stretch"
+                        Margin="5"
+                        VerticalAlignment="Stretch" />
+        </Border>
+        <Border Grid.Row="3"
+                BorderBrush="{DynamicResource {x:Static SystemColors.ActiveCaptionTextBrushKey}}"
+                BorderThickness="3"
+                CornerRadius="3"
+                Margin="5">
+            <StackPanel Orientation="Horizontal"
+                        HorizontalAlignment="Left"
+                        Margin="5"
+                        VerticalAlignment="Center">
+                <TextBlock  HorizontalAlignment="Stretch"
+                            Margin="2"
+                            VerticalAlignment="Stretch"
+                            Text="Dictionary In Use:" />
+                <TextBlock  x:Name="txtDictionaryInUse"
+                            HorizontalAlignment="Stretch"
+                            Margin="20,2,2,2"
+                            VerticalAlignment="Stretch"
+                            Text="None" />
+
+            </StackPanel>
+        </Border>
+    </Grid>
+</Window>
