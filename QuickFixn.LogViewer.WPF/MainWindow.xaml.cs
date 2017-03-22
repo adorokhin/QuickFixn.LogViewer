@@ -14,7 +14,7 @@ using System.Windows.Shapes;
 using QuickFixn.Converters;
 using System.Xml.Linq;
 using System.Reflection;
-using IOPath=System.IO;
+using IOPath = System.IO;
 
 /*
  20160620-14:53:42.784 : 8=FIXT.1.19=104535=R34=2449=MA52=20160620-14:53:42.84356=MDGSTAPI131=QuoteReqID-1466434422842-219337146=155=[N/A]48=283483HV022=16360=Education454=1455=US283483HV04456=420200=120201=220202=120203=99.7500000020204=80020205=320206=Unassigned Bonds460=111227=BOND29703=MNPX167=NONE541=20181201225=20061102223=0.05106=EL PASO CNTY COLO SCH DIST NO 49 FALCON GO REF BDS 2006B107=EL PASO CNTY COLO SCH DIST NO 49 FALCON  5.000 12/1/18873=2006110254=238=100000064=2016062315=USD1=TEST660=99581=162=20160620-15:28:00126=20160620-14:58:0060=20160620-14:53:42423=1453=5448=mdgsclt01447=D452=11802=1523=MDGS Client 1803=9448=ML-PEND447=C452=13448=STP Capital Management, Inc.447=D452=13448=MDGS447=C452=17802=1523=0103803=17448=Middlegate Securities Ltd447=D452=1758=RGNL (N/A) requests  offer on $1,000,000 283483HV0, due at 10:58 AM EDT, Multi-Dealers, .5625=220117=36940475961=MNPrice5626=55215=Y5627=Submitted5630=Respond, Pass20120=C2D-RFQ-Open21031=N21032=N20066=369404620067=120013=0.00510=057
@@ -26,7 +26,7 @@ namespace QuickFixn.LogViewer.WPF
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    
+
     public partial class MainWindow : Window
     {
         private string sFIXDictionary = @"..\..\..\Dictionary\FIX50SP2.xml";
@@ -35,7 +35,7 @@ namespace QuickFixn.LogViewer.WPF
         {
             InitializeComponent();
             fixConv = FIXConverter.CreateInstance(sFIXDictionary);
-            txtDictionaryInUse.Text = sFIXDictionary; 
+            txtDictionaryInUse.Text = sFIXDictionary;
         }
 
         public static string AssemblyDirectory
@@ -49,32 +49,74 @@ namespace QuickFixn.LogViewer.WPF
             }
         }
 
+        private string currConvertedFileName;
+
+        private void DumpXMLToFile(string sXML)
+        {
+            if (sXML != null)
+                sXML = sXML.Trim();
+            if (string.IsNullOrEmpty(sXML))
+                return;
+
+            var fileName = DateTime.Now.ToString("yyyyMMdd_HHmmssfff") + ".xml";
+            var filePath = IOPath.Path.Combine(AssemblyDirectory, "Converted", fileName);
+            System.IO.File.WriteAllText(filePath, sXML);
+
+            var rootPath = IOPath.Path.GetPathRoot(filePath);
+            var dir = IOPath.Path.GetDirectoryName(filePath);
+
+            currConvertedFileName = filePath.Replace(rootPath, "\\\\127.0.0.1\\C$\\");
+
+        }
+
         private void btnConvert_Click(object sender, RoutedEventArgs e)
         {
             StringBuilder sb = new StringBuilder();
-            
-            int lineCount = input.LineCount;
-            if(lineCount <= 0)
-                return;
-            sb.Append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
-            sb.Append("<Log>");
-            for (int lineNo = 0; lineNo < lineCount; lineNo++)
-            {
-                string s = input.GetLineText(lineNo);
-                s = s.Replace('|', '\x01');
-                s = s.TrimEnd('\r');
-                s = s.TrimEnd('\n');
-                s = s.Trim();
-                if (!string.IsNullOrEmpty(s))
-                {
-                    XElement xe = fixConv.BuildXMLFromString(s);
-                    sb.Append(xe.ToString());
-                }
-            }
-            sb.Append("</Log>");
+            string s = string.Empty;
 
-            this.webBrowser.NavigateToString(sb.ToString());
-            //this.webBrowser.NavigateToString("Hello");
+            var ischkbDumpXML = (chkbDumpXMLToFile.IsChecked.HasValue && (chkbDumpXMLToFile.IsChecked.Value == true));
+
+            try
+            {
+                int lineCount = input.LineCount;
+                if (lineCount <= 0)
+                    return;
+                if (ischkbDumpXML)
+                    sb.Append("<!--saved from url = (0016)http://localhost -->");
+                sb.Append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+                sb.Append("<Log>");
+                for (int lineNo = 0; lineNo < lineCount; lineNo++)
+                {
+                    s = input.GetLineText(lineNo);
+                    s = s.Replace('|', '\x01');
+                    s = s.TrimEnd('\r');
+                    s = s.TrimEnd('\n');
+                    s = s.Trim();
+                    if (!(string.IsNullOrEmpty(s)) && !(s.StartsWith("#")))
+                    {
+                        XElement xe = fixConv.BuildXMLFromString(s);
+                        sb.Append(xe.ToString());
+                    }
+                }
+                sb.Append("</Log>");
+
+                if (ischkbDumpXML)
+                {
+                    DumpXMLToFile(sb.ToString());
+                    this.webBrowser.Navigate("file:///" + currConvertedFileName);
+                }
+                else
+                    this.webBrowser.NavigateToString(sb.ToString());
+            }
+            catch (Exception ex)
+            {
+                try
+                {
+                    this.webBrowser.NavigateToString(ex.FeedFormatExceptionHTML("Failed to process line: " + s));
+                }
+                catch { }
+
+            }
         }
 
         private void btnLoadDictionary_Click(object sender, RoutedEventArgs e)
@@ -88,7 +130,7 @@ namespace QuickFixn.LogViewer.WPF
             {
                 sFIXDictionary = dlg.FileName;
                 FIXConverter.LoadDictionary(sFIXDictionary);
-                txtDictionaryInUse.Text = sFIXDictionary; 
+                txtDictionaryInUse.Text = sFIXDictionary;
             }
         }
     }

@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Xml.Linq;
 using FIXDictionary = QuickFix.DataDictionary;
 using QuickFixn.LogFileProcessor;
+using System.Security.Permissions;
 
 namespace QuickFixn.LogViewer.ConsoleApp
 {
@@ -150,7 +151,7 @@ namespace QuickFixn.LogViewer.ConsoleApp
 		static void Main(string[] args)
 		{
 
-			Test1();
+			//Test1();
 			//Test2(@"C:\Users\AlexD\Downloads\fix2json-master\fix2json-master\testfiles\44_new_order_cross.txt");
 			//Test2(@"C:\Users\AlexD\Downloads\fix2json-master\fix2json-master\testfiles\42_order_single.txt");
 			//Test2(@"C:\Users\AlexD\Downloads\fix2json-master\fix2json-master\testfiles\100FIX42.dat");
@@ -162,10 +163,58 @@ namespace QuickFixn.LogViewer.ConsoleApp
 			//Test3(@"C:\DEV\FIX\QuickFixn.LogViewer\TestData\FIX.4.4-FABKOM_TO_RBC-RBC_TO_FABKOM.messages.current.log");
 			//Test3(@"C:\DEV\FIX\QuickFixn.LogViewer\TestData\WBNA.log");
 			//Test3(@"C:\DEV\FIX\QuickFixn.LogViewer\TestData\WBNA2.log");
+			Run();
 
 			Console.WriteLine("Am I really Done?");
 			Console.ReadKey();
 
 		}
+
+		private static FileSystemWatcher watcher = null;
+
+		[PermissionSet(SecurityAction.Demand, Name = "FullTrust")]
+		public static void Run()
+		{
+			string filePath = @"C:\Temp";
+
+			watcher = new FileSystemWatcher();
+			
+			watcher.Path = filePath;
+
+			/* Watch for changes in LastAccess and LastWrite times, and
+			 the renaming of files or directories. */
+			watcher.NotifyFilter = NotifyFilters.Size | NotifyFilters.FileName;
+				//NotifyFilters.LastAccess 
+				//NotifyFilters.LastWrite 
+				//NotifyFilters.DirectoryName;
+			
+			
+			// Only watch text files.
+			watcher.Filter = "test.txt";
+			watcher.IncludeSubdirectories = false;
+
+			// Add event handlers.
+			watcher.Changed += new FileSystemEventHandler(OnChanged);
+			watcher.Created += new FileSystemEventHandler(OnChanged);
+			watcher.Deleted += new FileSystemEventHandler(OnChanged);
+			watcher.Renamed += new RenamedEventHandler(OnRenamed);
+
+			// Begin watching.
+			watcher.EnableRaisingEvents = true;
+		}
+
+		// Define the event handlers.
+		private static void OnChanged(object source, FileSystemEventArgs e)
+		{
+			// Specify what is done when a file is changed, created, or deleted.
+			Console.WriteLine("==> {0} [{1}] {2} {3}", DateTime.Now.ToLocalTime(), e.ChangeType, e.FullPath, source.GetType().ToString());
+		}
+
+		private static void OnRenamed(object source, RenamedEventArgs e)
+		{
+			// Specify what is done when a file is renamed.
+			Console.WriteLine("File: {0} renamed to {1}", e.OldFullPath, e.FullPath);
+		}
+
 	}
 }
