@@ -29,10 +29,12 @@ namespace QuickFixn.LogViewer.WPF
 
     public partial class MainWindow : Window
     {
-        private string sFIXDictionary = @"..\..\..\Dictionary\FIX50SP2.xml";
+        private string sFIXDictionary; // = @"..\..\..\Dictionary\FIX50SP2.xml";
         FIXConverter fixConv;
         public MainWindow()
         {
+            sFIXDictionary = Properties.Settings.Default.sFIXDictionary;
+
             InitializeComponent();
             fixConv = FIXConverter.CreateInstance(sFIXDictionary);
             txtDictionaryInUse.Text = sFIXDictionary;
