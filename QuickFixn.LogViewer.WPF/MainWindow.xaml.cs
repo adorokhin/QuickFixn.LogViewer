@@ -130,9 +130,16 @@ namespace QuickFixn.LogViewer.WPF
             Nullable<bool> result = dlg.ShowDialog();
             if (result == true)
             {
-                sFIXDictionary = dlg.FileName;
-                FIXConverter.LoadDictionary(sFIXDictionary);
-                txtDictionaryInUse.Text = sFIXDictionary;
+                try
+                {
+                    sFIXDictionary = dlg.FileName;
+                    FIXConverter.LoadDictionary(sFIXDictionary);
+                    txtDictionaryInUse.Text = sFIXDictionary;
+                }
+                catch (Exception ex)
+                {
+                    this.webBrowser.NavigateToString(ex.FeedFormatExceptionHTML($"Failed to load dictionary: {sFIXDictionary}"));
+                }
             }
         }
     }
