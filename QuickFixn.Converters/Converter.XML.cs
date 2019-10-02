@@ -19,7 +19,7 @@ namespace QuickFixn.Converters
 		
 		public override string ToString()
 		{
-			return string.Format("{0}.{1} MsgType=\"{2}\"", nameSpace, className, msgType);
+			return $@"{nameSpace}.{className } MsgType=""{msgType}""";
 		}
 	}
 

@@ -1,10 +1,12 @@
 ﻿using QuickFixn.Converters;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace QuickFixn.LogFileProcessor
@@ -190,11 +192,11 @@ void ReadAndProcessFiles(string[] filePaths)
                 {
                     String[] details = Regex.Split(trace, "\\s+");
 
-                    Instruction instruction = new Instruction(details[0],
-                        int.Parse(details[1]),
-                        int.Parse(details[2]));
-                    Console.WriteLine("computing...");
-                    instructions.Add(instruction);
+                    //Instruction instruction = new Instruction(details[0],
+                    //    int.Parse(details[1]),
+                    //    int.Parse(details[2]));
+                    //Console.WriteLine("computing...");
+                    //instructions.Add(instruction);
                 }
             }
         }

@@ -104,12 +104,18 @@ namespace QuickFixn.LogViewer.ConsoleApp
 					{
 						sw.Stop();
 						Console.SetCursorPosition(cursorLeft, cursorTop);
-						Console.WriteLine(string.Format("Line: {0, 10}  {1}%", counter++, ((fileStream.Position / (fileSize * 1.0)) * 100).ToString("F3")));
+                        Console.WriteLine($"Line: {counter++,10}  File Stream Position: {(fileStream.Position / (fileSize * 1.0)) * 100}%");
 						sw.Start();
 
 						//XElement xe = fixConv.BuildXMLFromString(line);
-						string sjson = fixConv.BuildJSONFromString(line);
-					}
+						var sJSON = fixConv.BuildJSONFromString(line);
+
+                        using (System.IO.StreamWriter file = new System.IO.StreamWriter(testDataFileName + ".out", true))
+                        {
+                            file.WriteLine(sJSON + Environment.NewLine);
+                        }
+
+                    }
 					catch (Exception ex)
 					{
 						err_counter++;
@@ -151,9 +157,12 @@ namespace QuickFixn.LogViewer.ConsoleApp
 		static void Main(string[] args)
 		{
 
-			//Test1();
-			//Test2(@"C:\Users\AlexD\Downloads\fix2json-master\fix2json-master\testfiles\44_new_order_cross.txt");
-			//Test2(@"C:\Users\AlexD\Downloads\fix2json-master\fix2json-master\testfiles\42_order_single.txt");
+            //Test1();
+            
+            //Test2(@"C:\DEV\FIX\QuickFixn.LogViewer\TestData\FIX.4.4-MAP_MIDD_PROD-MAP_BLP_PROD.messages.current.log");
+            Test2(@"C:\DEV\FIX\QuickFixn.LogViewer\TestData\100FIX42.dat");
+			
+            //Test2(@"C:\Users\AlexD\Downloads\fix2json-master\fix2json-master\testfiles\42_order_single.txt");
 			//Test2(@"C:\Users\AlexD\Downloads\fix2json-master\fix2json-master\testfiles\100FIX42.dat");
 			//Test2(@"C:\DEV\FIX\QuickFixn.LogViewer\TestData\FIX.4.4-FABKOM_TO_RBC-RBC_TO_FABKOM.messages.current.log");
 			
@@ -175,7 +184,7 @@ namespace QuickFixn.LogViewer.ConsoleApp
 		[PermissionSet(SecurityAction.Demand, Name = "FullTrust")]
 		public static void Run()
 		{
-			string filePath = @"C:\Temp";
+			string filePath = @"C:\Temp\QuickFixn_Converter\";
 
 			watcher = new FileSystemWatcher();
 			
@@ -190,7 +199,7 @@ namespace QuickFixn.LogViewer.ConsoleApp
 			
 			
 			// Only watch text files.
-			watcher.Filter = "test.txt";
+			watcher.Filter = "*.txt";
 			watcher.IncludeSubdirectories = false;
 
 			// Add event handlers.

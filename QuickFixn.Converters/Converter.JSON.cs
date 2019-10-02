@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using QuickFix;
 using QuickFix.Fields;
 using System;
 using System.Collections.Generic;
@@ -15,6 +16,7 @@ namespace QuickFixn.Converters
     {
         public string BuildJSONFromString(string s, bool validateMsg = false, bool correctChks = true)
         {
+            string sJSON = string.Empty;
             DateTime? logTimeStamp = null;
             int fixStart = s.IndexOf("8=FIX");
             if (fixStart > 0)
@@ -27,7 +29,6 @@ namespace QuickFixn.Converters
                     logTimeStamp = dateTime;
                 s = s.Substring(fixStart);
             }
-
 
             var msg = new QuickFix.Message();
 
@@ -46,10 +47,14 @@ namespace QuickFixn.Converters
 
             MsgType msgType = QuickFix.Message.IdentifyType(s);
             //Very inefficient. Need to rewrite to build JSON myself.
-            XElement xElem = BuildXML(msg, msgType, logTimeStamp, sOrigChks);
-            string jsonText = JsonConvert.SerializeXmlNode(xElem.GetXmlNode());
+            sJSON = BuildJSON(msg, msgType, logTimeStamp, sOrigChks);
+            
+            //sJSON = JsonConvert.SerializeObject(msg);
+            
+            //string sJSON = JsonConvert.SerializeXmlNode(xElem.GetXmlNode());
+            //XElement xElem = BuildXML(msg, msgType, logTimeStamp, sOrigChks);
             //=================================================================
-            return jsonText;
+            return sJSON;
 
             //JTokenWriter writer = new JTokenWriter();
             //writer.WriteStartObject();
@@ -67,40 +72,88 @@ namespace QuickFixn.Converters
             //return o.ToString();
         }
 
+
+        public class FIX_Header { }
+        public class FIX_Body { }
+        public class FIX_Trailer { }
+
+        public class FIX_Message
+        {
+            public FIX_Header header;
+            public FIX_Body body;
+            public FIX_Trailer trailer;
+        }
+        /*
+        {
+            "glossary": {
+                "title": "example glossary",
+		        "GlossDiv": {
+                    "title": "S",
+			        "GlossList": {
+                        "GlossEntry": {
+                            "ID": "SGML",
+					        "SortAs": "SGML",
+					        "GlossTerm": "Standard Generalized Markup Language",
+					        "Acronym": "SGML",
+					        "Abbrev": "ISO 8879:1986",
+					        "GlossDef": {
+                                "para": "A meta-markup language, used to create markup languages such as DocBook.",
+						        "GlossSeeAlso": ["GML", "XML"]
+                            },
+					        "GlossSee": "markup"
+                        }
+                    }
+                }
+            }
+        }         
+        */
+        private string FormatJSONPair(string name, string value, int indent = 0)
+        {
+            var s = $@"{new string(' ', indent)}""{name}"":""{value}""";
+            return s;
+        }
+        private string FormatJSONPair(string name, DateTime? value, int indent = 0)
+        {
+            var s = string.Empty;
+            if (value.HasValue)
+                s = $@"{new string(' ', indent)}""{name}"":""{JsonConvert.SerializeObject(value.Value)}""";
+            return s;
+        }
+
         public string BuildJSON(QuickFix.Message msg, MsgType msgType, DateTime? logTimeStamp = null, string origChkSum = null)
         {
+            //JObject jo = JObject.FromObject(fixMsg);
+            //jo.Add("feeClass", "A");
+            //string sJSON = jo.ToString();
+            
+
             ////Debug.WriteLine(" ~~~> " + msg.GetType().ToString());
-            //SessionID sessionID = msg.GetSessionID(msg);
+            SessionID sessionID = msg.GetSessionID(msg);
 
-            //FIXClassInfo fixClass = null;
-            //if (msg.GetType() == typeof(QuickFix.Message))
-            //{
-            //    var classes = fixClasses[msgType.ToString(), Utils.NormalizeFIXNameSpace(sessionID.BeginString)];
-            //    if (classes != null && classes.Count > 0)
-            //        fixClass = classes[0];
-            //}
+            FIXClassInfo fixClass = null;
+            if (msg.GetType() == typeof(QuickFix.Message))
+            {
+                var classes = fixClasses[msgType.ToString(), Utils.NormalizeFIXNameSpace(sessionID.BeginString)];
+                if (classes != null && classes.Count > 0)
+                    fixClass = classes[0];
+            }
 
-            ////var root = new XElement(msg.GetType().ToString());
-            //var root = new XElement((fixClass != null) ? fixClass.type.FullName : msg.GetType().ToString());
-            //root.Add(new XAttribute("MessageType", msgType.ToString()));
-            //root.Add(new XAttribute("Session", sessionID.ToString()));
-            //if (logTimeStamp.HasValue)
-            //    root.Add(new XAttribute("LogTimeStamp", logTimeStamp.Value));
+            StringBuilder sb = new StringBuilder();
+            var root = (fixClass != null) ? fixClass.type.FullName : msg.GetType().ToString();
+            sb.Append("{");
+            sb.Append($@"""{root}"":");
+            sb.Append(FormatJSONPair("MessageType", msg.GetType().ToString()));
+            sb.Append(FormatJSONPair("Session", sessionID.ToString()));
+            sb.Append(FormatJSONPair("LogTimeStamp", logTimeStamp));
 
-            //var header = new XElement(msg.Header.GetType().ToString());
-            //ProcessFieldMapToXML(header, msg.Header);
-            //root.Add(header);
+            ProcessFieldMapToJSON(sb, msg.Header);
+            ProcessFieldMapToJSON(sb, msg);
+            ProcessFieldMapToJSON(sb, msg.Trailer, origChkSum);
 
-            //var body = new XElement(msg.GetType().ToString() + ".Body");
-            //ProcessFieldMapToXML(body, msg);
-            //root.Add(body);
+            sb.Append(" }");
+            sb.Append("}");
 
-            //var trailer = new XElement(msg.Trailer.GetType().ToString());
-            //ProcessFieldMapToXML(trailer, msg.Trailer, origChkSum);
-            //root.Add(trailer);
-
-            //return root;
-            return "";
+            return sJSON;
         }
 
         //private void ProcessFieldMapToXML(XElement parent, FieldMap fieldMap, string origChkSum = null)
