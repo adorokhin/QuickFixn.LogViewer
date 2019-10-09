@@ -162,7 +162,7 @@ namespace QuickFixn.Converters
         {
             Type fieldType;
             sb.Append($@"""{sNode}"":");
-
+            /*
             foreach (var field in fieldMap)
             {
                 if (dataDictionary.TryGetFieldType(field.Key, out fieldType))
@@ -206,6 +206,7 @@ namespace QuickFixn.Converters
                 }
                 parent.Add(child);
             }
+            */
             sb.Append("}");
         }
 
