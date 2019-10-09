@@ -9,6 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using FIXDictionary = QuickFix.DataDictionary;
 
 namespace QuickFixn.Converters
 {
@@ -72,17 +73,6 @@ namespace QuickFixn.Converters
             //return o.ToString();
         }
 
-
-        public class FIX_Header { }
-        public class FIX_Body { }
-        public class FIX_Trailer { }
-
-        public class FIX_Message
-        {
-            public FIX_Header header;
-            public FIX_Body body;
-            public FIX_Trailer trailer;
-        }
         /*
         {
             "glossary": {
@@ -119,6 +109,18 @@ namespace QuickFixn.Converters
                 s = $@"{new string(' ', indent)}""{name}"":""{JsonConvert.SerializeObject(value.Value)}""";
             return s;
         }
+        /*
+         //Sample
+        {
+	        "QuickFix.FIX44.ExecutionReport": {
+            "MessageType":"QuickFix.FIX44.ExecutionReport",
+            "Session":"FIX.4.4:BLP->MAP_GPSE_PRD",
+            "LogTimeStamp":"2019-10-09T14:25:34.187Z",
+            "Header": {
+            }
+	    }
+}     
+        */
 
         public string BuildJSON(QuickFix.Message msg, MsgType msgType, DateTime? logTimeStamp = null, string origChkSum = null)
         {
@@ -146,64 +148,66 @@ namespace QuickFixn.Converters
             sb.Append(FormatJSONPair("Session", sessionID.ToString()));
             sb.Append(FormatJSONPair("LogTimeStamp", logTimeStamp));
 
-            ProcessFieldMapToJSON(sb, msg.Header);
-            ProcessFieldMapToJSON(sb, msg);
-            ProcessFieldMapToJSON(sb, msg.Trailer, origChkSum);
+            ProcessFieldMapToJSON("Header", sb, msg.Header);
+            ProcessFieldMapToJSON("Body", sb, msg);
+            ProcessFieldMapToJSON("Trailer", sb, msg.Trailer, origChkSum);
 
-            sb.Append(" }");
+            sb.Append("}");
             sb.Append("}");
 
-            return sJSON;
+            return sb.ToString();
         }
 
-        //private void ProcessFieldMapToXML(XElement parent, FieldMap fieldMap, string origChkSum = null)
-        //{
-        //    Type fieldType;
-        //    XElement child = null;
-        //    foreach (var field in fieldMap)
-        //    {
-        //        if (dataDictionary.TryGetFieldType(field.Key, out fieldType))
-        //        {
-        //            FIXDictionary.DDField ddField = dataDictionary.FieldsByTag[field.Key];
-        //            child = new XElement(ddField.Name);
-        //            child.Add(new XAttribute("Tag", field.Key));
-        //            child.Add(new XAttribute("Value", field.Value));
-        //            if (ddField.HasEnums())
-        //            {
-        //                child.Add(new XAttribute("HasEnums", true));
-        //                string enumTranslation = ddField.EnumDict.FirstOrDefault(t => t.Key == field.Value.ToString()).Value;
-        //                if (!string.IsNullOrEmpty(enumTranslation))
-        //                    child.Add(new XAttribute("EnumTranslation", enumTranslation));
-        //            }
+        private void ProcessFieldMapToJSON(string sNode, StringBuilder sb, FieldMap fieldMap, string origChkSum = null)
+        {
+            Type fieldType;
+            sb.Append($@"""{sNode}"":");
 
-        //            if (field.Key == Tags.CheckSum && origChkSum != null)
-        //            {
-        //                child.Add(new XAttribute("OrigChks", origChkSum));
-        //            }
+            foreach (var field in fieldMap)
+            {
+                if (dataDictionary.TryGetFieldType(field.Key, out fieldType))
+                {
+                    FIXDictionary.DDField ddField = dataDictionary.FieldsByTag[field.Key];
+                    child = new XElement(ddField.Name);
+                    child.Add(new XAttribute("Tag", field.Key));
+                    child.Add(new XAttribute("Value", field.Value));
+                    if (ddField.HasEnums())
+                    {
+                        child.Add(new XAttribute("HasEnums", true));
+                        string enumTranslation = ddField.EnumDict.FirstOrDefault(t => t.Key == field.Value.ToString()).Value;
+                        if (!string.IsNullOrEmpty(enumTranslation))
+                            child.Add(new XAttribute("EnumTranslation", enumTranslation));
+                    }
 
-        //            int groupCount = fieldMap.GroupCount(field.Key);
+                    if (field.Key == Tags.CheckSum && origChkSum != null)
+                    {
+                        child.Add(new XAttribute("OrigChks", origChkSum));
+                    }
 
-        //            if (groupCount > 0)
-        //            {
-        //                child.Add(new XAttribute("IsGroup", "Y"));
-        //                child.Add(new XAttribute("GroupsCount", groupCount));
+                    int groupCount = fieldMap.GroupCount(field.Key);
 
-        //                for (int i = 1; i <= groupCount; i++)
-        //                {
-        //                    Group currGroup = fieldMap.GetGroup(i, field.Key);
-        //                    ProcessFieldMapToXML(child, currGroup);
-        //                }
-        //            }
-        //        }
-        //        else
-        //        {
-        //            child = new XElement("UserDefined_" + field.Key.ToString());
-        //            child.Add(new XAttribute("Tag", field.Key));
-        //            child.Add(new XAttribute("Value", field.Value));
-        //        }
-        //        parent.Add(child);
-        //    }
-        //}
+                    if (groupCount > 0)
+                    {
+                        child.Add(new XAttribute("IsGroup", "Y"));
+                        child.Add(new XAttribute("GroupsCount", groupCount));
+
+                        for (int i = 1; i <= groupCount; i++)
+                        {
+                            Group currGroup = fieldMap.GetGroup(i, field.Key);
+                            ProcessFieldMapToXML(child, currGroup);
+                        }
+                    }
+                }
+                else
+                {
+                    child = new XElement("UserDefined_" + field.Key.ToString());
+                    child.Add(new XAttribute("Tag", field.Key));
+                    child.Add(new XAttribute("Value", field.Value));
+                }
+                parent.Add(child);
+            }
+            sb.Append("}");
+        }
 
     }
 }
