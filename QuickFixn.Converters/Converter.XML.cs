@@ -182,12 +182,18 @@ namespace QuickFixn.Converters
 			
 
 			MsgType msgType = QuickFix.Message.IdentifyType(s);
+			
+			var map = dataDictionary.GetMapForMessage(msgType.ToString());
+
 			return BuildXML(msg, msgType, logTimeStamp, sOrigChks);
 		}
 
 		public XElement BuildXML(QuickFix.Message msg,  MsgType msgType, DateTime? logTimeStamp = null, string origChkSum = null)
 		{
 			//Debug.WriteLine(" ~~~> " + msg.GetType().ToString());
+
+
+
 			SessionID sessionID = msg.GetSessionID(msg);
 
 			FIXClassInfo fixClass = null;
