@@ -31,6 +31,8 @@ ipch/
 [Dd]ebug*/
 [Rr]elease*/
 Ankh.NoLoad
+.vs/
+QuickFixn.LogViewer/.vs 
 
 DictionaryPrivate/
 Exported/
@@ -41,6 +43,7 @@ LogViewer/
 Properties/
 Reactive Extentions/
 Store/
+FileContentIndex/
 
 
 

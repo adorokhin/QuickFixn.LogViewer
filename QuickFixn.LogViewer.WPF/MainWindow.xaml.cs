@@ -29,10 +29,12 @@ namespace QuickFixn.LogViewer.WPF
 
     public partial class MainWindow : Window
     {
-        private string sFIXDictionary = @"..\..\..\Dictionary\FIX50SP2.xml";
+        private string sFIXDictionary; // = @"..\..\..\Dictionary\FIX50SP2.xml";
         FIXConverter fixConv;
         public MainWindow()
         {
+            sFIXDictionary = Properties.Settings.Default.sFIXDictionary;
+
             InitializeComponent();
             fixConv = FIXConverter.CreateInstance(sFIXDictionary);
             txtDictionaryInUse.Text = sFIXDictionary;
@@ -128,9 +130,16 @@ namespace QuickFixn.LogViewer.WPF
             Nullable<bool> result = dlg.ShowDialog();
             if (result == true)
             {
-                sFIXDictionary = dlg.FileName;
-                FIXConverter.LoadDictionary(sFIXDictionary);
-                txtDictionaryInUse.Text = sFIXDictionary;
+                try
+                {
+                    sFIXDictionary = dlg.FileName;
+                    FIXConverter.LoadDictionary(sFIXDictionary);
+                    txtDictionaryInUse.Text = sFIXDictionary;
+                }
+                catch (Exception ex)
+                {
+                    this.webBrowser.NavigateToString(ex.FeedFormatExceptionHTML($"Failed to load dictionary: {sFIXDictionary}"));
+                }
             }
         }
     }

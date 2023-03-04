@@ -119,13 +119,13 @@
     <AppDesigner Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="LogViewer.ico" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\QuickFixn.Converters\QuickFixn.Converters.Lib.csproj">
       <Project>{550313b7-c389-4121-801b-0511783bd18f}</Project>
       <Name>QuickFixn.Converters.Lib</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="LogViewer.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

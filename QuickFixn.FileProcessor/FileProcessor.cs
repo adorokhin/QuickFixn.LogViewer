@@ -1,10 +1,12 @@
 ﻿using QuickFixn.Converters;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace QuickFixn.LogFileProcessor
@@ -15,7 +17,8 @@ namespace QuickFixn.LogFileProcessor
         public FIXConverter FIXConverter { set; private get; }
         public string FileName { set; private get; }
 
-        public QuickFIXLogFileProcessor()
+        
+		public QuickFIXLogFileProcessor()
         {
         }
 
@@ -141,5 +144,105 @@ namespace QuickFixn.LogFileProcessor
 
             return streamLimits;
         }
+		
+///
+/// https://stackoverflow.com/questions/20928705/read-and-process-files-in-parallel-c-sharp
+///
+void ReadAndProcessFiles(string[] filePaths)
+{
+    // Our thread-safe collection used for the handover.
+    var lines = new BlockingCollection<string>();
+
+    // Build the pipeline.
+    var stage1 = Task.Run(() =>
+    {
+        try
+        {
+            foreach (var filePath in filePaths)
+            {
+                using (var reader = new StreamReader(filePath))
+                {
+                    string line;
+
+                    while ((line = reader.ReadLine()) != null)
+                    {
+                        // Hand over to stage 2 and continue reading.
+                        lines.Add(line);
+                    }
+                }
+            }
+        }
+        finally
+        {
+            lines.CompleteAdding();
+        }
+    });
+
+    var stage2 = Task.Run(() =>
+    {
+        // Process lines on a ThreadPool thread
+        // as soon as they become available.
+        foreach (var line in lines.GetConsumingEnumerable())
+        {
+            String pattern = "\\s{4,}";
+
+            foreach (String trace in Regex.Split(line, pattern))
+            {
+                if (trace != String.Empty)
+                {
+                    String[] details = Regex.Split(trace, "\\s+");
+
+                    //Instruction instruction = new Instruction(details[0],
+                    //    int.Parse(details[1]),
+                    //    int.Parse(details[2]));
+                    //Console.WriteLine("computing...");
+                    //instructions.Add(instruction);
+                }
+            }
+        }
+    });
+	
+	/*
+	 //highly doubt that it's your CPU work holding things up, but if it happens to be the case, you can also parallelise stage 2 like so:
+	 var stage2 = Task.Run(() =>
+    {
+        var parallelOptions = new ParallelOptions { MaxDegreeOfParallelism = Environment.ProcessorCount };
+
+        Parallel.ForEach(lines.GetConsumingEnumerable(), parallelOptions, line =>
+        {
+            String pattern = "\\s{4,}";
+
+            foreach (String trace in Regex.Split(line, pattern))
+            {
+                if (trace != String.Empty)
+                {
+                    String[] details = Regex.Split(trace, "\\s+");
+
+                    Instruction instruction = new Instruction(details[0],
+                        int.Parse(details[1]),
+                        int.Parse(details[2]));
+                    Console.WriteLine("computing...");
+                    instructions.Add(instruction);
+                }
+            }
+        });
+    });
+	*/
+	
+	
+	
+
+    // Block until both tasks have completed.
+    // This makes this method prone to deadlocking.
+    // Consider using 'await Task.WhenAll' instead.
+    Task.WaitAll(stage1, stage2);
+}		
+		
+		
+		
     }
 }
+
+
+
+
