@@ -32,7 +32,10 @@ ipch/
 [Rr]elease*/
 Ankh.NoLoad
 .vs/
+<<<<<<< HEAD
 QuickFixn.LogViewer/.vs 
+=======
+>>>>>>> f3fd39bef0dca3b00015e815d9d9e4a715e87849
 
 DictionaryPrivate/
 Exported/
