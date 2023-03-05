@@ -14,6 +14,7 @@ using System.Windows.Shapes;
 using QuickFixn.Converters;
 using System.Xml.Linq;
 using System.Reflection;
+using System.Diagnostics;
 using IOPath = System.IO;
 
 /*
@@ -33,11 +34,23 @@ namespace QuickFixn.LogViewer.WPF
         FIXConverter fixConv;
         public MainWindow()
         {
-            sFIXDictionary = Properties.Settings.Default.sFIXDictionary;
+            sFIXDictionary = Properties.Settings.Default.FIX_Dictionary;
 
             InitializeComponent();
             fixConv = FIXConverter.CreateInstance(sFIXDictionary);
             txtDictionaryInUse.Text = sFIXDictionary;
+
+            DisplayAssemblyInfo();
+        }
+
+        private void DisplayAssemblyInfo()
+        {
+            Assembly assembly = Assembly.GetExecutingAssembly();
+            //Version version = Assembly.GetEntryAssembly().GetName().Version;
+            Version assemblyVer = assembly.GetName().Version;
+            FileVersionInfo fvi = FileVersionInfo.GetVersionInfo(assembly.Location);
+            string fileVer = fvi.FileVersion;
+            txtAssemblyVersion.Text = $"A:{assemblyVer} F:{fileVer}";
         }
 
         public static string AssemblyDirectory

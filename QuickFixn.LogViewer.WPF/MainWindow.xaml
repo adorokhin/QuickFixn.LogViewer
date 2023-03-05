@@ -83,7 +83,7 @@
                 CornerRadius="3"
                 Margin="5">
             <StackPanel Orientation="Horizontal"
-                        HorizontalAlignment="Left"
+                        HorizontalAlignment="Stretch"
                         Margin="5"
                         VerticalAlignment="Center">
                 <TextBlock  HorizontalAlignment="Stretch"
@@ -92,9 +92,14 @@
                             Text="Dictionary In Use:" />
                 <TextBlock  x:Name="txtDictionaryInUse"
                             HorizontalAlignment="Stretch"
-                            Margin="20,2,2,2"
+                            Margin="80,2,2,2"
                             VerticalAlignment="Stretch"
                             Text="None" />
+                <TextBlock  x:Name="txtAssemblyVersion"
+                            HorizontalAlignment="Right"
+                            Margin="160,2,2,2"
+                            VerticalAlignment="Stretch"
+                            Text="None" FontSize="10" FontWeight="Bold" FontStyle="Italic" Foreground="DarkGreen" />
 
             </StackPanel>
         </Border>

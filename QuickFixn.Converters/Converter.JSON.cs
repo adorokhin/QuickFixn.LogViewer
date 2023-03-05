@@ -165,6 +165,7 @@ namespace QuickFixn.Converters
 
             foreach (var field in fieldMap)
             {
+                XElement child;
                 if (dataDictionary.TryGetFieldType(field.Key, out fieldType))
                 {
                     FIXDictionary.DDField ddField = dataDictionary.FieldsByTag[field.Key];
@@ -204,7 +205,7 @@ namespace QuickFixn.Converters
                     child.Add(new XAttribute("Tag", field.Key));
                     child.Add(new XAttribute("Value", field.Value));
                 }
-                parent.Add(child);
+                //parent.Add(child); ???
             }
             sb.Append("}");
         }
