@@ -14,6 +14,17 @@
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <WarningLevel>4</WarningLevel>
     <TargetFrameworkProfile />
+    <ShouldCreateLogs>True</ShouldCreateLogs>
+    <AdvancedSettingsExpanded>False</AdvancedSettingsExpanded>
+    <UpdateAssemblyVersion>True</UpdateAssemblyVersion>
+    <UpdateAssemblyFileVersion>True</UpdateAssemblyFileVersion>
+    <UpdateAssemblyInfoVersion>True</UpdateAssemblyInfoVersion>
+    <AssemblyVersionSettings>NoneWithAutoReset.IncrementOnDemandWithResetOnIncrease.Increment.Increment</AssemblyVersionSettings>
+    <UpdatePackageVersion>False</UpdatePackageVersion>
+    <AssemblyInfoVersionType>SettingsVersion</AssemblyInfoVersionType>
+    <InheritWinAppVersionFrom>None</InheritWinAppVersionFrom>
+    <AssemblyFileVersionSettings>NoneWithAutoReset.IncrementOnDemandWithResetOnIncrease.Increment.Increment</AssemblyFileVersionSettings>
+    <AssemblyInfoVersionSettings>NoneWithAutoReset.IncrementOnDemandWithResetOnIncrease.Increment.Increment</AssemblyInfoVersionSettings>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -60,6 +71,7 @@
     <ApplicationIcon>LogViewer.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="QuickFix, Version=1.7.0.0, Culture=neutral, PublicKeyToken=null" />
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
@@ -79,6 +91,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Colors\ColorsTester.cs" />
+    <Compile Include="Colors\PantoneColors.cs" />
+    <Compile Include="Colors\RandomPastelColorGenerator.cs" />
     <Compile Include="Utils.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -119,13 +134,19 @@
     <AppDesigner Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\QuickFixn.Converters\QuickFixn.Converters.Lib.csproj">
+    <ProjectReference Include="..\QuickFixn.Converters\QuickFIXn.Converters.Lib.csproj">
       <Project>{550313b7-c389-4121-801b-0511783bd18f}</Project>
-      <Name>QuickFixn.Converters.Lib</Name>
+      <Name>QuickFIXn.Converters.Lib</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Resource Include="LogViewer.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Graphics\TextBoxInputBackground.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Config\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

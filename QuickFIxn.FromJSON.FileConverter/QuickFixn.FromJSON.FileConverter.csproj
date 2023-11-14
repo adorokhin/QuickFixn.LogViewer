@@ -10,8 +10,8 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{EDB2C01B-C31F-44D8-90F7-5B764946CF5A}</ProjectGuid>
     <OutputType>Exe</OutputType>
-    <RootNamespace>QuickFixn.JSON.FileConverter</RootNamespace>
-    <AssemblyName>QuickFixn.JSON.FileConverter</AssemblyName>
+    <RootNamespace>QuickFIXn.JSON.FileConverter</RootNamespace>
+    <AssemblyName>QuickFIXn.JSON.FileConverter</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -99,6 +99,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="QuickFIXn.Extentions.cs" />
+    <Compile Include="JSONToFIX.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

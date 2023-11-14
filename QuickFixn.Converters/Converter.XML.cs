@@ -84,7 +84,7 @@ namespace QuickFixn.Converters
 	//      Persistent = 0x02,
 	//      Buffered = 0x04
 	//}
-	
+
 	public partial class FIXConverter
 	{
 		[ThreadStatic]
@@ -98,12 +98,12 @@ namespace QuickFixn.Converters
 			{
 				Instance = new FIXConverter();
 
-				if(!string.IsNullOrEmpty(sFIXDictionary))
+				if (!string.IsNullOrEmpty(sFIXDictionary))
 				{
 					dataDictionary = new FIXDictionary.DataDictionary();
 					dataDictionary.Load(sFIXDictionary);
 				}
-				
+
 				fixClasses = FIXClassesInfo.CreateInstance();
 				fixClasses.LoadQuickFIXTypesInfo("QuickFix.FIX");
 			}
@@ -126,6 +126,11 @@ namespace QuickFixn.Converters
 			get { return _IncludeDebugAttributes; }
 			set { _IncludeDebugAttributes = value; }
 		}
+
+		public static Dictionary<int,QuickFix.DataDictionary.DDField> DictionaryFields
+		{
+			get {return dataDictionary.FieldsByTag;}
+		}
 		#endregion
 
 		public static void LoadDictionary(string sFIXDictionary)
@@ -134,7 +139,7 @@ namespace QuickFixn.Converters
 			{
 				dataDictionary = new FIXDictionary.DataDictionary();
 				dataDictionary.Load(sFIXDictionary);
-			}
+            }
 		}
 
 		public XElement BuildXMLFromString(string s, bool validateMsg = false, bool correctChks=true)

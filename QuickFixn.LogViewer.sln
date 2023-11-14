@@ -3,15 +3,19 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.2.32630.192
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuickFixn.Converters.Lib", "QuickFixn.Converters\QuickFixn.Converters.Lib.csproj", "{550313B7-C389-4121-801B-0511783BD18F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuickFIXn.Converters.Lib", "QuickFixn.Converters\QuickFIXn.Converters.Lib.csproj", "{550313B7-C389-4121-801B-0511783BD18F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuickFixn.LogViewer.ConsoleApp", "QuickFixn.LogViewer.ConsoleApp\QuickFixn.LogViewer.ConsoleApp.csproj", "{4E717977-3F1F-4B1F-A0B7-93AED7280DF3}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuickFIXn.LogViewer.ConsoleApp", "QuickFixn.LogViewer.ConsoleApp\QuickFIXn.LogViewer.ConsoleApp.csproj", "{4E717977-3F1F-4B1F-A0B7-93AED7280DF3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuickFixn.LogFileProcessor.Lib", "QuickFixn.FileProcessor\QuickFixn.LogFileProcessor.Lib.csproj", "{D2729EF0-E16C-4407-8DBA-8927AAD48B36}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuickFIXn.LogFileProcessor.Lib", "QuickFixn.FileProcessor\QuickFIXn.LogFileProcessor.Lib.csproj", "{D2729EF0-E16C-4407-8DBA-8927AAD48B36}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuickFixn.LogViewer.WPF", "QuickFixn.LogViewer.WPF\QuickFixn.LogViewer.WPF.csproj", "{ADA3E735-F5A1-4A3B-AF78-901198F262FF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuickFIXn.LogViewer.WPF", "QuickFixn.LogViewer.WPF\QuickFIXn.LogViewer.WPF.csproj", "{ADA3E735-F5A1-4A3B-AF78-901198F262FF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuickFixn.FromJSON.FileConverter", "QuickFIxn.FromJSON.FileConverter\QuickFixn.FromJSON.FileConverter.csproj", "{EDB2C01B-C31F-44D8-90F7-5B764946CF5A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuickFIXn.FromJSON.FileConverter", "QuickFIxn.FromJSON.FileConverter\QuickFIXn.FromJSON.FileConverter.csproj", "{EDB2C01B-C31F-44D8-90F7-5B764946CF5A}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QuickFIXn.LogViewer.ZTests", "QuickFixn,LogViewer.Tests\QuickFIXn.LogViewer.ZTests.csproj", "{D78BC223-F4F0-4E40-B6A4-22FBFD59E65C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleApp1", "ConsoleApp1\ConsoleApp1.csproj", "{86109B0C-6F06-4DBB-9844-1867679F93E5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -61,6 +65,22 @@ Global
 		{EDB2C01B-C31F-44D8-90F7-5B764946CF5A}.Release|Any CPU.Build.0 = Release|Any CPU
 		{EDB2C01B-C31F-44D8-90F7-5B764946CF5A}.Release|x86.ActiveCfg = Release|Any CPU
 		{EDB2C01B-C31F-44D8-90F7-5B764946CF5A}.Release|x86.Build.0 = Release|Any CPU
+		{D78BC223-F4F0-4E40-B6A4-22FBFD59E65C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D78BC223-F4F0-4E40-B6A4-22FBFD59E65C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D78BC223-F4F0-4E40-B6A4-22FBFD59E65C}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{D78BC223-F4F0-4E40-B6A4-22FBFD59E65C}.Debug|x86.Build.0 = Debug|Any CPU
+		{D78BC223-F4F0-4E40-B6A4-22FBFD59E65C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D78BC223-F4F0-4E40-B6A4-22FBFD59E65C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D78BC223-F4F0-4E40-B6A4-22FBFD59E65C}.Release|x86.ActiveCfg = Release|Any CPU
+		{D78BC223-F4F0-4E40-B6A4-22FBFD59E65C}.Release|x86.Build.0 = Release|Any CPU
+		{86109B0C-6F06-4DBB-9844-1867679F93E5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{86109B0C-6F06-4DBB-9844-1867679F93E5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{86109B0C-6F06-4DBB-9844-1867679F93E5}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{86109B0C-6F06-4DBB-9844-1867679F93E5}.Debug|x86.Build.0 = Debug|Any CPU
+		{86109B0C-6F06-4DBB-9844-1867679F93E5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{86109B0C-6F06-4DBB-9844-1867679F93E5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{86109B0C-6F06-4DBB-9844-1867679F93E5}.Release|x86.ActiveCfg = Release|Any CPU
+		{86109B0C-6F06-4DBB-9844-1867679F93E5}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
